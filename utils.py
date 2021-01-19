@@ -32,12 +32,14 @@ def prepare_facebank(conf, model, mtcnn, tta = True):
     model.eval()
     embeddings =  []
     names = ['Unknown']
+
     for path in conf.facebank_path.iterdir():
         if path.is_file():
             continue
         else:
             embs = []
             for file in path.iterdir():
+                print(file)
                 if not file.is_file():
                     continue
                 else:

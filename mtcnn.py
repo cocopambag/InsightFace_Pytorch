@@ -26,6 +26,7 @@ class MTCNN():
         return Image.fromarray(warped_face)
     
     def align_multi(self, img, limit=None, min_face_size=30.0):
+
         boxes, landmarks = self.detect_faces(img, min_face_size)
         if limit:
             boxes = boxes[:limit]
