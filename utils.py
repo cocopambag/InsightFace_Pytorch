@@ -10,6 +10,8 @@ import torch
 from model import l2_norm
 import pdb
 import cv2
+from Face_Detector import Detector
+import os
 
 def separate_bn_paras(modules):
     if not isinstance(modules, list):
@@ -28,7 +30,7 @@ def separate_bn_paras(modules):
                 paras_wo_bn.extend([*layer.parameters()])
     return paras_only_bn, paras_wo_bn
 
-def prepare_facebank(conf, model, mtcnn, tta = True):
+def prepare_facebank(conf, model, D, tta = True):
     model.eval()
     embeddings =  []
     names = ['Unknown']
@@ -39,7 +41,6 @@ def prepare_facebank(conf, model, mtcnn, tta = True):
         else:
             embs = []
             for file in path.iterdir():
-                print(file)
                 if not file.is_file():
                     continue
                 else:
@@ -47,8 +48,15 @@ def prepare_facebank(conf, model, mtcnn, tta = True):
                         img = Image.open(file)
                     except:
                         continue
-                    if img.size != (112, 112):
-                        img = mtcnn.align(img)
+
+                    _, img = D.detect(img)
+
+                    if img == [None] or img == []:
+                        print('remove ' + str(file))
+                        os.remove(file)
+                        break
+                    img = img[0]
+
                     with torch.no_grad():
                         if tta:
                             mirror = trans.functional.hflip(img)
