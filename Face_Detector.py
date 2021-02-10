@@ -34,7 +34,12 @@ class Detector:
 
     def make_face(self, img, bbox):
         (l, t, r, b) = bbox
-        face = img[t:b+1, l:r+1 :]
+        if l < 0: l = 0
+        if t < 0: t = 0
+        if r < 0: r = 0
+        if b < 0: b = 0
+
+        face = img[t:b, l:r:]
         if 0 in face.shape:
             return
         face = cv2.resize(face, self.s)

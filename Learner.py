@@ -16,7 +16,6 @@ import bcolz
 
 class face_learner(object):
     def __init__(self, conf, inference=False):
-        print(conf)
         if conf.use_mobilfacenet:
             self.model = MobileFaceNet(conf.embedding_size).to(conf.device)
             print('MobileFaceNet model generated')
@@ -78,7 +77,7 @@ class face_learner(object):
         if from_save_folder:
             save_path = conf.save_path
         else:
-            save_path = conf.model_path            
+            save_path = conf.model_path
         self.model.load_state_dict(torch.load(save_path/'model_{}'.format(fixed_str)))
         if not model_only:
             self.head.load_state_dict(torch.load(save_path/'head_{}'.format(fixed_str)))

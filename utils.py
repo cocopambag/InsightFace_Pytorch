@@ -31,6 +31,7 @@ def separate_bn_paras(modules):
     return paras_only_bn, paras_wo_bn
 
 def prepare_facebank(conf, model, D, tta = True):
+
     model.eval()
     embeddings =  []
     names = ['Unknown']
