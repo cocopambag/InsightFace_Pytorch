@@ -45,18 +45,20 @@ def prepare_facebank(conf, model, D, tta = True):
                 if not file.is_file():
                     continue
                 else:
-                    try:
-                        img = Image.open(file)
-                    except:
-                        continue
+                    # try:
+                    #     img = Image.open(file)
+                    # except:
+                    #     continue
 
-                    _, img = D.detect(img)
+                    # _, img = D.detect(img)
+                    img = np.array(Image.open(file))
+                    img = cv2.resize(img, (112, 112))
 
-                    if img == [None] or img == []:
-                        print('remove ' + str(file))
-                        os.remove(file)
-                        break
-                    img = img[0]
+                    # if img == [None] or img == []:
+                    #     print('remove ' + str(file))
+                    #     os.remove(file)
+                    #     break
+                    # img = img[0]
 
                     with torch.no_grad():
                         if tta:

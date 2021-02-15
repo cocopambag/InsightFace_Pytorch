@@ -82,7 +82,7 @@ if __name__ == '__main__':
     dictionaries = next(os.walk(test_path))[1]
     names = dictionaries
     index = ['original', 'glasses', 'glasses_mask', 'mask']
-    values = []
+    values = [[0, 0, 0, 0]]
     except_dic = dict()
 
     # choice images to be included in the gallery and make .npy file.
@@ -127,6 +127,7 @@ if __name__ == '__main__':
         folders = next(os.walk(dic_path))[1]
         result = [0, 0, 0, 0]
         current = None
+
         for folder in folders:
             folder_path = dic_path + '/' + folder
             except_file = []
@@ -142,7 +143,7 @@ if __name__ == '__main__':
             else:
                 current = 0
             images = next(os.walk(folder_path))[2]
-
+            num = len(images)
             for image in images:
                 if image in except_file:
                     continue
@@ -151,28 +152,49 @@ if __name__ == '__main__':
                 img = cv2.imread(image_path)
 
                 list_bbox, faces = D.detect(img)
+                # if len(list_bbox) > 1: # case of face images than 1
+                #
+                #     if
+                #     faces = [faces[0]]
+                # elif len(list_bbox) == 0: # fail to search face
+                #     num -= 1
+                #     print("remove", image_path)
+                #     os.remove(image_path)
+                #     continue
+                if len(list_bbox) == 0: # fail to search face
+                    num -= 1
+                    print("remove", image_path)
+                    os.remove(image_path)
+                    continue
 
-                for bb in list_bbox:
+                r, score = learner.infer(conf, faces, targets, args.tta)
 
-                    r, score = learner.infer(conf, faces, targets, args.tta)
-
-                    try:
-                        if names[r + 1] != dic:
-                            pass
-                    except:
-                        r = r[0]
-
-                    if names[r + 1] != dic:
-                        # cv2.imshow('fail', a)
-                        # cv2.waitKey(10000)
+                try: # case of face images than 1
+                    if names[r+1] != dic:
                         pass
+                except:
+                    if r[0] == r[1]:
+                        r = r[0]
                     else:
-                        result[current] += 1
+                        continue
 
-            result[current] /= float(len(images))
+                if names[r+1] != dic:
+                    # print(dic)
+                    # print(names[r])
+                    # cv2.imshow('fail', img)
+                    # cv2.waitKey(10000)
+                    pass
+                else:
+                    result[current] += 1
+
+            result[current] /= float(num)
 
         print(dic, result)
         values.append(result)
 
+
     df = pd.DataFrame(values, index=names, columns=index)
     df.to_csv(save_path + '/' + 'check.csv')
+
+    del D
+    del learner
