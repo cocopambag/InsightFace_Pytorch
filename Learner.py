@@ -241,12 +241,13 @@ class face_learner(object):
                 emb = self.model(conf.test_transform(img).to(conf.device).unsqueeze(0))
                 emb_mirror = self.model(conf.test_transform(mirror).to(conf.device).unsqueeze(0))
                 embs.append(l2_norm(emb + emb_mirror))
-            else:                        
-                embs.append(self.model(conf.test_transform(img).to(conf.device).unsqueeze(0)))
+            else:
+                pre_processing = conf.test_transform(img).to(conf.device).unsqueeze(0).cuda().requires_grad_()
+                embs.append(self.model(pre_processing))
         source_embs = torch.cat(embs)
         
         diff = source_embs.unsqueeze(-1) - target_embs.transpose(1,0).unsqueeze(0)
         dist = torch.sum(torch.pow(diff, 2), dim=1)
         minimum, min_idx = torch.min(dist, dim=1)
         min_idx[minimum > self.threshold] = -1 # if no match, set idx to -1
-        return min_idx, minimum
+        return min_idx, minimum, pre_processing, embs

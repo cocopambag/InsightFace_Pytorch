@@ -8,6 +8,7 @@ from Learner import face_learner
 from utils import load_facebank, draw_box_name, prepare_facebank
 from Face_Detector import Detector
 from matplotlib import pyplot as plt
+import time
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='for face verification')
@@ -48,14 +49,15 @@ if __name__ == '__main__':
 
     # inital camera
     cap = cv2.VideoCapture(0)
-    cap.set(3,1280)
-    cap.set(4,720)
+    # cap.set(3,1280)
+    # cap.set(4,720)
     if args.save:
         video_writer = cv2.VideoWriter(conf.data_path/'recording.avi', cv2.VideoWriter_fourcc(*'XVID'), 6, (1280, 720))
         # frame rate 6 due to my laptop is quite slow...
 
     # my code
     while cap.isOpened():
+        current = time.time()
         _, frame = cap.read()
         if _:
             try:
@@ -64,7 +66,7 @@ if __name__ == '__main__':
                 bboxes, faces = D.detect(image)
                 bboxes = bboxes.astype(int)
                 bboxes = bboxes + [-1, -1, 1, 1]
-                results, score = learner.infer(conf, faces, targets, args.tta)
+                results, score, _, _ = learner.infer(conf, faces, targets, args.tta)
                 for idx,bbox in enumerate(bboxes):
                     if args.score:
                         frame = draw_box_name(bbox, names[results[idx] + 1] + '_{:.2f}'.format(score[idx]), frame)
@@ -80,6 +82,8 @@ if __name__ == '__main__':
 
         if cv2.waitKey(1)&0xFF == ord('q'):
             break
+
+        print(1/(time.time() - current))
 
     cap.release()
     if args.save:

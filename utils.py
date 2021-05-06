@@ -50,9 +50,14 @@ def prepare_facebank(conf, model, D, tta = True):
                     # except:
                     #     continue
 
-                    # _, img = D.detect(img)
                     img = np.array(Image.open(file))
-                    img = cv2.resize(img, (112, 112))
+                    _, img = D.detect(img)
+
+                    try:
+                        img = cv2.resize(np.array(img[0]), (112, 112))
+                    except:
+                        print(file)
+                        continue
 
                     # if img == [None] or img == []:
                     #     print('remove ' + str(file))

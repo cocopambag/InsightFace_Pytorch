@@ -54,7 +54,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', dest='test_path', type=str)
     parser.add_argument('-s', dest='save_path', type=str)
-    parser.add_argument('-n', dest='gallery_num', type=int)
+    parser.add_argument('-n', dest='gallery_num', type=int, default=0)
     parser.add_argument('-th', '--threshold', help='threshold to decide identical faces', default=1.54, type=float)
     parser.add_argument("-u", "--update", help="whether perform update the facebank", action="store_true",
                         default=False)
@@ -85,19 +85,26 @@ if __name__ == '__main__':
     values = [[0, 0, 0, 0]]
     except_dic = dict()
 
-    # choice images to be included in the gallery and make .npy file.
-    for dic in dictionaries:  # Each people
-        dic_path = test_path + '/' + dic
-        save_folder_path = save_path + '/' + dic
-        folders = next(os.walk(dic_path))[1]
+    if gallery_num == 0:
+        print("Don't make test files")
+        dictionaries = next(os.walk(save_path))[1]
+        for dic in dictionaries:
+            dic_path = save_path + '/' + dic
+            except_dic[dic] = next(os.walk(dic_path))[2]
 
-        origin = dic_path + '/' + dic
-        mask = dic_path + '/' + index[3]
-        glasses = dic_path + '/' + index[1]
-        m_s = dic_path + '/' + index[2]
+        gallery_num = len(dic)
+    else:
+        print("Make test files and Be chosen to {}".format(test_path))
+        # choice images to be included in the gallery and make .npy file.
+        for dic in dictionaries:  # Each people
+            dic_path = test_path + '/' + dic
+            save_folder_path = save_path + '/' + dic
+            folders = next(os.walk(dic_path))[1]
 
-        except_image = make_gallery(origin, save_path, gallery_num)
-        except_dic[dic] = except_image
+            origin = dic_path + '/' + dic
+
+            except_image = make_gallery(origin, save_path, gallery_num)
+            except_dic[dic] = except_image
 
     D = Detector(thresh=0.9)
     print('Retinaface loaded')
@@ -167,7 +174,7 @@ if __name__ == '__main__':
                     os.remove(image_path)
                     continue
 
-                r, score = learner.infer(conf, faces, targets, args.tta)
+                r, score, _, _ = learner.infer(conf, faces, targets, args.tta)
 
                 try: # case of face images than 1
                     if names[r+1] != dic:
