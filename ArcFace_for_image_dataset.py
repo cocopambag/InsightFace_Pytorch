@@ -17,6 +17,10 @@ from pathlib import Path
 from PIL import Image
 
 
+##
+# args: -t ../Face-Recognition-test/9_21 -s ch -u
+
+##
 def make_gallery(origin, save_path, gallery_num):
     '''
     :param origin: Original people folder name

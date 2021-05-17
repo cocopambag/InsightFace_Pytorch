@@ -10,6 +10,10 @@ from Face_Detector import Detector
 from matplotlib import pyplot as plt
 import time
 
+
+##
+# args: -u -m True
+##
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='for face verification')
     parser.add_argument("-s", "--save", help="whether save",action="store_true",)

@@ -20,6 +20,10 @@ from matplotlib import pyplot as plt
 import matplotlib
 # matplotlib.use('TkAgg')
 
+##
+# args: -s /home/user/다운로드/lfw -t /home/user/다운로드/lfw -m Ture
+##
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', dest='test_path', type=str)
